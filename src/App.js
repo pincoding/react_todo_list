@@ -1,4 +1,11 @@
-import { Box, Container, Heading, Input } from "@chakra-ui/react";
+import {
+  Box,
+  Checkbox,
+  Container,
+  Heading,
+  Input,
+  VStack,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -15,18 +22,32 @@ const App = () => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
   const onSubmitHandler = (data) => {
     const { todo } = data;
     settodos([
       ...todos,
+      // 원래 객체에서 뒤에 이어서 넣어진다
+      // ... 배열을 까고 객체를 가지고와준다
       {
         id: Date.now(),
+        //아이디 값을 시간값으로 대신한다.
         text: todo,
         finish: false,
       },
     ]);
+    reset();
+    //reset() : input창 입력후 없어짐
+  };
+
+  const onChangeCheck = (id) => {
+    settodos(
+      todos.map((data) =>
+        data.id === id ? { ...data, finish: !data.finish } : data
+      )
+    );
   };
 
   useEffect(() => {
@@ -54,6 +75,26 @@ const App = () => {
           borderColor={"gray.400"}
           size={"md"}
         />
+      </Box>
+
+      <Box>
+        <VStack>
+          {todos.map((data) => (
+            <Checkbox
+              key={data.id}
+              w={"100%"}
+              size={"lg"}
+              h={"60px"}
+              bgColor={"white"}
+              p={"15px"}
+              borderRadius={"10px"}
+              isChecked={data.finish}
+              onChange={() => onChangeCheck(data.id)}
+            >
+              <Box>{data.text}</Box>
+            </Checkbox>
+          ))}
+        </VStack>
       </Box>
     </Container>
   );
