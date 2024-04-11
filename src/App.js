@@ -5,8 +5,17 @@ import {
   Heading,
   Input,
   VStack,
+  Flex,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
+  Button,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const App = () => {
@@ -16,7 +25,9 @@ const App = () => {
     // JSON.parse json문자열의 구문을 분석하고, 그결과에서 자바스크립트로 반환한다
   });
 
-  console.log(todos);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef();
+  const [currentId, setcurrentId] = useState();
 
   const {
     register,
@@ -55,6 +66,10 @@ const App = () => {
     // JSON.stringify 자바스크립트 값을 json형식으로 바꾼다
   }, [todos]);
 
+  const onClickDelete = (id) => {
+    settodos(todos.filter((todo) => todo.id !== id));
+  };
+
   return (
     <Container
       maxW={"450px"}
@@ -91,11 +106,42 @@ const App = () => {
               isChecked={data.finish}
               onChange={() => onChangeCheck(data.id)}
             >
-              <Box>{data.text}</Box>
+              <Flex>
+                <Box>{data.text}</Box>
+                <DeleteIcon
+                  onClick={() => {
+                    onOpen();
+                    setcurrentId(data.id);
+                  }}
+                />
+              </Flex>
             </Checkbox>
           ))}
         </VStack>
       </Box>
+
+      <AlertDialog isOpen={isOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>삭제 확인</AlertDialogHeader>
+
+          <AlertDialogBody>정말 삭제 하시겠습니까?</AlertDialogBody>
+
+          <AlertDialogFooter>
+            <Button ref={cancelRef} onClick={onClose}>
+              취소
+            </Button>
+            <Button
+              onClick={() => {
+                onClickDelete(currentId);
+                onClose();
+              }}
+            >
+              삭제
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <Checkbox colorScheme={"red"}> Checkbox</Checkbox>
     </Container>
   );
 };
@@ -103,3 +149,5 @@ export default App;
 // https://chakra-ui.com/ css ui
 // npm i @chakra-ui/react @emotion/react @emotion/styled framer-motion
 // npm i @fontsource/noto-sans-kr
+
+//기한 19일까지
